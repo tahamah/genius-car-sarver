@@ -22,6 +22,7 @@ async function run() {
     try {
         await client.connect()
         const serviceCollection = client.db('guniesCar').collection('service')
+        const orderCollection = client.db('guniesCar').collection('order')
 
         //all
         app.get('/service', async (req, res) => {
@@ -51,6 +52,21 @@ async function run() {
             const id = req.params.id
             const query = { _id: ObjectId(id) }
             const result = await serviceCollection.deleteOne(query)
+            res.send(result)
+        })
+
+        //order collection API
+        app.get('/order', async (req, res) => {
+            const email = req.query.email
+            const query = { email: email }
+            const cursor = orderCollection.find(query)
+            const orders = await cursor.toArray()
+            res.send(orders)
+        })
+
+        app.post('/order', async (req, res) => {
+            const order = req.body
+            const result = await orderCollection.insertOne(order)
             res.send(result)
         })
     } finally {
